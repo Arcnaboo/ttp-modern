@@ -9,7 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+/Terorsuz_Turkiye_Platformu
 # testing
 /coverage
 
