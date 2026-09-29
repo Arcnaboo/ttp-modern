@@ -43,7 +43,7 @@ npm start
 - `/iletisim`
 - `/admin/login` ve panel: kurul, il başkanlıkları, bölge sorumluları, haberler, sayfa metinleri, Instagram, iletişim, sosyal medya, şifre
 
-Eski `.php` adresleri kalıcı olarak bu yollara yönlenir. Görseller `public/wp-content/uploads` ve `public/assets` altındadır; veritabanındaki yollar aynı kalır. Yeni yüklemeler `public/wp-content/uploads/admin` altına yazılır.
+Eski `.php` adresleri kalıcı olarak bu yollara yönlenir. Görseller `public/wp-content/uploads` ve `public/assets` altındadır; veritabanındaki yollar aynı kalır. Yeni yüklemeler `public/wp-content/uploads/admin` altına yazılır. Sekme ikonu `public/logo.png` dosyasıdır.
 
 Admin oturumu httpOnly çerezdir. Beş hatalı giriş aynı IP’yi 15 dakika kilitler. Boşta 2 saat, en fazla 12 saat geçerlidir.
 

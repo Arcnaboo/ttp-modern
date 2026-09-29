@@ -7,6 +7,11 @@ export const metadata: Metadata = {
     template: "%s — Terörsüz Türkiye Platformu",
   },
   description: "Hepimiz kardeşiz. Milli birlik, kardeşlik ve dayanışma iradesiyle terörsüz bir Türkiye.",
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
