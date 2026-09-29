@@ -1,0 +1,23 @@
+# Yükleme klasöründe HİÇBİR script çalıştırılmaz. Buraya bir şekilde .php dosyası
+# yazılabilse bile çalıştırılamaz (savunma katmanı).
+#
+# NOT: php_flag yalnızca mod_php altında geçerlidir; PHP-FPM/FastCGI çalışan
+# sunucularda tanınmayan direktif 500 hatası verir, bu yüzden IfModule içinde.
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+
+<IfModule mod_mime.c>
+  RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phar
+  RemoveType .php .phtml .php3 .php4 .php5 .php7 .phar
+</IfModule>
+
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar|cgi|pl|py|sh|htaccess)$">
+  Require all denied
+</FilesMatch>
