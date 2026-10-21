@@ -1,4 +1,5 @@
 import { instagramAction } from "@/lib/actions";
+import { AdminFileField } from "@/components/admin-file-field";
 import { Notice } from "@/components/notice";
 import { getInstagramPosts, getSettings } from "@/lib/content";
 import { assetUrl } from "@/lib/paths";
@@ -41,7 +42,7 @@ export default async function InstagramAdminPage({ searchParams }: { searchParam
           </select>
         </label>
         <label>Açıklama<textarea name="caption" /></label>
-        <label>Görsel<input name="image" type="file" accept="image/*" required /></label>
+        <AdminFileField name="image" label="Görsel" required />
         <div className="ttpa-actions"><button className="btn" type="submit">Ekle</button></div>
       </form>
     </>

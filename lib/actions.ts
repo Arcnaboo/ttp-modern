@@ -8,7 +8,7 @@ import { sanitizeRichText } from "@/lib/html";
 import { syncInstagram } from "@/lib/instagram";
 import { redirectWithNotice } from "@/lib/notice";
 import { slugify } from "@/lib/paths";
-import { saveUpload } from "@/lib/upload";
+import { resolveUpload } from "@/lib/upload";
 
 function refreshPublic() {
   revalidatePath("/");
@@ -65,7 +65,7 @@ export async function boardAction(formData: FormData) {
   const org = String(formData.get("org") ?? "").trim();
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   if (!name || !title) redirectWithNotice(`/admin/board${id ? `?edit=${id}` : ""}`, "err", "Ad soyad ve unvan zorunludur.");
-  const upload = await saveUpload(formData.get("photo"), ["jpg", "png", "webp", "gif"]);
+  const upload = await resolveUpload(formData, "photo", ["jpg", "png", "webp", "gif"]);
   if (upload.error) redirectWithNotice(`/admin/board${id ? `?edit=${id}` : ""}`, "err", upload.error);
   if (id) {
     if (upload.path) {
@@ -98,8 +98,8 @@ export async function coordinatorAction(formData: FormData) {
   if (!name || !title) {
     redirectWithNotice(`/admin/region-coordinators${id ? `?edit=${id}` : ""}`, "err", "Ad soyad ve unvan zorunludur.");
   }
-  const photo = await saveUpload(formData.get("photo"), ["jpg", "png", "webp", "gif"]);
-  const certificate = await saveUpload(formData.get("certificate"), ["jpg", "png", "webp", "gif"]);
+  const photo = await resolveUpload(formData, "photo", ["jpg", "png", "webp", "gif"]);
+  const certificate = await resolveUpload(formData, "certificate", ["jpg", "png", "webp", "gif"]);
   if (photo.error || certificate.error) {
     redirectWithNotice(`/admin/region-coordinators${id ? `?edit=${id}` : ""}`, "err", photo.error || certificate.error || "Dosya hatası.");
   }
@@ -137,8 +137,8 @@ export async function representativeAction(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim() || "İl Başkanı";
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   if (!name) redirectWithNotice(back, "err", "Ad soyad zorunludur.");
-  const photo = await saveUpload(formData.get("photo"), ["jpg", "png", "webp", "gif"]);
-  const certificate = await saveUpload(formData.get("certificate"), ["jpg", "png", "webp", "gif"]);
+  const photo = await resolveUpload(formData, "photo", ["jpg", "png", "webp", "gif"]);
+  const certificate = await resolveUpload(formData, "certificate", ["jpg", "png", "webp", "gif"]);
   if (photo.error || certificate.error) redirectWithNotice(back, "err", photo.error || certificate.error || "Dosya hatası.");
   await sql`
     INSERT INTO representatives (plate, name, title, photo, certificate, sort_order)
@@ -170,8 +170,8 @@ export async function memberAction(formData: FormData) {
   const parentId = parentRaw ? Number(parentRaw) : null;
   const sortOrder = Number(formData.get("sort_order") ?? 0);
   if (!name) redirectWithNotice(back, "err", "Ad soyad zorunludur.");
-  const photo = await saveUpload(formData.get("photo"), ["jpg", "png", "webp", "gif"]);
-  const certificate = await saveUpload(formData.get("certificate"), ["jpg", "png", "webp", "gif"]);
+  const photo = await resolveUpload(formData, "photo", ["jpg", "png", "webp", "gif"]);
+  const certificate = await resolveUpload(formData, "certificate", ["jpg", "png", "webp", "gif"]);
   if (photo.error || certificate.error) redirectWithNotice(back, "err", photo.error || certificate.error || "Dosya hatası.");
   if (id) {
     await sql`
@@ -214,7 +214,7 @@ export async function newsAction(formData: FormData) {
     SELECT id FROM news WHERE slug = ${slug} AND id <> ${id} LIMIT 1
   `;
   if (taken.length) slug = `${slug}-${Date.now().toString(36).slice(-5)}`;
-  const cover = await saveUpload(formData.get("cover_image"), ["jpg", "png", "webp", "gif"]);
+  const cover = await resolveUpload(formData, "cover_image", ["jpg", "png", "webp", "gif"]);
   if (cover.error) redirectWithNotice(`/admin/news${id ? `?edit=${id}` : ""}`, "err", cover.error);
   if (id) {
     if (cover.path) {
@@ -264,7 +264,7 @@ export async function heroAction(formData: FormData) {
       await saveSetting(key, "");
       continue;
     }
-    const upload = await saveUpload(formData.get(key), ["jpg", "png", "webp", "gif"]);
+    const upload = await resolveUpload(formData, key, ["jpg", "png", "webp", "gif"]);
     if (upload.error) redirectWithNotice("/admin/site-settings", "err", upload.error);
     if (upload.path) await saveSetting(key, upload.path);
   }
@@ -280,7 +280,7 @@ export async function documentAction(formData: FormData) {
     redirectWithNotice("/admin/site-settings", "ok", "Belge silindi.");
   }
   const title = String(formData.get("doc_title") ?? "").trim();
-  const file = await saveUpload(formData.get("doc_file"), ["pdf", "jpg", "png", "webp"]);
+  const file = await resolveUpload(formData, "doc_file", ["pdf", "jpg", "png", "webp"]);
   if (!title || !file.path) redirectWithNotice("/admin/site-settings", "err", file.error || "Belge başlığı ve dosyası zorunludur.");
   await sql`INSERT INTO documents (title, file, sort_order) VALUES (${title}, ${file.path}, 0)`;
   refreshPublic();
@@ -301,7 +301,7 @@ export async function socialAction(formData: FormData) {
   for (const key of ["social_instagram", "social_facebook", "social_twitter", "social_linkedin", "instagram_username", "instagram_bio", "instagram_access_token"]) {
     await saveSetting(key, String(formData.get(key) ?? "").trim());
   }
-  const avatar = await saveUpload(formData.get("instagram_profile_image"), ["jpg", "png", "webp", "gif"]);
+  const avatar = await resolveUpload(formData, "instagram_profile_image", ["jpg", "png", "webp", "gif"]);
   if (avatar.error) redirectWithNotice("/admin/social", "err", avatar.error);
   if (avatar.path) await saveSetting("instagram_profile_image", avatar.path);
   refreshPublic();
@@ -323,7 +323,7 @@ export async function instagramAction(formData: FormData) {
   const permalink = String(formData.get("permalink") ?? "").trim();
   const caption = String(formData.get("caption") ?? "");
   const mediaType = String(formData.get("media_type") ?? "image");
-  const image = await saveUpload(formData.get("image"), ["jpg", "png", "webp", "gif"]);
+  const image = await resolveUpload(formData, "image", ["jpg", "png", "webp", "gif"]);
   if (!permalink || !image.path) redirectWithNotice("/admin/instagram", "err", image.error || "Bağlantı ve görsel zorunludur.");
   await sql`
     INSERT INTO instagram_posts (ig_id, permalink, image, caption, media_type, posted_at, sort_order)

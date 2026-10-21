@@ -1,4 +1,5 @@
 import { newsAction } from "@/lib/actions";
+import { AdminFileField } from "@/components/admin-file-field";
 import { Notice } from "@/components/notice";
 import { getNews } from "@/lib/content";
 import { dateInputValue } from "@/lib/format";
@@ -35,7 +36,7 @@ export default async function NewsAdminPage({ searchParams }: { searchParams: Pr
         <label>Başlık<input name="title" defaultValue={editing?.title ?? ""} required /></label>
         <label>Adres (slug)<input name="slug" defaultValue={editing?.slug ?? ""} /></label>
         <label>Tarih<input name="published_at" type="date" defaultValue={editing ? dateInputValue(editing.published_at) : new Date().toISOString().slice(0, 10)} required /></label>
-        <label>Kapak<input name="cover_image" type="file" accept="image/*" /></label>
+        <AdminFileField name="cover_image" label="Kapak" />
         <label>Metin<textarea name="body_html" defaultValue={editing?.body_html ?? ""} /></label>
         <div className="ttpa-actions"><button className="btn" type="submit">Kaydet</button></div>
       </form>

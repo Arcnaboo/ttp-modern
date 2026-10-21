@@ -1,4 +1,5 @@
 import { boardAction } from "@/lib/actions";
+import { AdminFileField } from "@/components/admin-file-field";
 import { Notice } from "@/components/notice";
 import { SafeImg } from "@/components/safe-img";
 import { getBoard } from "@/lib/content";
@@ -15,7 +16,15 @@ export default async function BoardAdminPage({ searchParams }: { searchParams: P
       <Notice ok={search.ok} hata={search.hata} />
       <div className="ttpa-card">
         <table className="ttpa-table">
-          <thead><tr><th></th><th>Ad Soyad</th><th>Unvan</th><th>Birim</th><th></th></tr></thead>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Ad Soyad</th>
+              <th>Unvan</th>
+              <th>Birim</th>
+              <th></th>
+            </tr>
+          </thead>
           <tbody>
             {members.map((member) => (
               <tr key={member.id}>
@@ -24,10 +33,14 @@ export default async function BoardAdminPage({ searchParams }: { searchParams: P
                 <td>{member.title}</td>
                 <td>{member.org}</td>
                 <td>
-                  <a className="btn small secondary" href={`/admin/board?edit=${member.id}`}>Düzenle</a>
+                  <a className="btn small secondary" href={`/admin/board?edit=${member.id}`}>
+                    Düzenle
+                  </a>
                   <form action={boardAction} style={{ display: "inline" }}>
                     <input type="hidden" name="delete_id" value={member.id} />
-                    <button className="btn small danger" type="submit">Sil</button>
+                    <button className="btn small danger" type="submit">
+                      Sil
+                    </button>
                   </form>
                 </td>
               </tr>
@@ -38,12 +51,28 @@ export default async function BoardAdminPage({ searchParams }: { searchParams: P
       <form className="ttpa-card ttpa-form" action={boardAction}>
         <h3>{editing ? "Üyeyi düzenle" : "Üye ekle"}</h3>
         <input type="hidden" name="id" value={editing?.id ?? 0} />
-        <label>Ad Soyad<input name="name" defaultValue={editing?.name ?? ""} required /></label>
-        <label>Unvan<input name="title" defaultValue={editing?.title ?? ""} required /></label>
-        <label>Birim<input name="org" defaultValue={editing?.org ?? ""} /></label>
-        <label>Sıra<input name="sort_order" type="number" defaultValue={editing?.sort_order ?? members.length + 1} /></label>
-        <label>Fotoğraf<input name="photo" type="file" accept="image/*" /></label>
-        <div className="ttpa-actions"><button className="btn" type="submit">Kaydet</button></div>
+        <label>
+          Ad Soyad
+          <input name="name" defaultValue={editing?.name ?? ""} required />
+        </label>
+        <label>
+          Unvan
+          <input name="title" defaultValue={editing?.title ?? ""} required />
+        </label>
+        <label>
+          Birim
+          <input name="org" defaultValue={editing?.org ?? ""} />
+        </label>
+        <label>
+          Sıra
+          <input name="sort_order" type="number" defaultValue={editing?.sort_order ?? members.length + 1} />
+        </label>
+        <AdminFileField name="photo" label="Fotoğraf" />
+        <div className="ttpa-actions">
+          <button className="btn" type="submit">
+            Kaydet
+          </button>
+        </div>
       </form>
     </>
   );

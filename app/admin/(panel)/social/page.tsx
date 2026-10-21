@@ -1,4 +1,5 @@
 import { socialAction } from "@/lib/actions";
+import { AdminFileField } from "@/components/admin-file-field";
 import { Notice } from "@/components/notice";
 import { getSettings } from "@/lib/content";
 
@@ -17,7 +18,7 @@ export default async function SocialAdminPage({ searchParams }: { searchParams: 
         <label>Instagram kullanıcı adı<input name="instagram_username" defaultValue={settings.instagram_username ?? ""} /></label>
         <label>Instagram açıklama<textarea name="instagram_bio" defaultValue={settings.instagram_bio ?? ""} /></label>
         <label>Instagram erişim anahtarı<input name="instagram_access_token" defaultValue={settings.instagram_access_token ?? ""} /></label>
-        <label>Profil görseli<input name="instagram_profile_image" type="file" accept="image/*" /></label>
+        <AdminFileField name="instagram_profile_image" label="Profil görseli" />
         <div className="ttpa-actions"><button className="btn" type="submit">Kaydet</button></div>
       </form>
     </>

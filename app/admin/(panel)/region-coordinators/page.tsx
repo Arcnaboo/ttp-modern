@@ -1,4 +1,5 @@
 import { coordinatorAction } from "@/lib/actions";
+import { AdminFileField } from "@/components/admin-file-field";
 import { Notice } from "@/components/notice";
 import { getCoordinators } from "@/lib/content";
 
@@ -34,8 +35,8 @@ export default async function CoordinatorsPage({ searchParams }: { searchParams:
         <label>Ad Soyad<input name="name" defaultValue={editing?.name ?? ""} required /></label>
         <label>Unvan<input name="title" defaultValue={editing?.title ?? ""} required /></label>
         <label>Sıra<input name="sort_order" type="number" defaultValue={0} /></label>
-        <label>Fotoğraf<input name="photo" type="file" accept="image/*" /></label>
-        <label>Yetki belgesi<input name="certificate" type="file" accept="image/*" /></label>
+        <AdminFileField name="photo" label="Fotoğraf" />
+        <AdminFileField name="certificate" label="Yetki belgesi" />
         <div className="ttpa-actions"><button className="btn" type="submit">Kaydet</button></div>
       </form>
     </>

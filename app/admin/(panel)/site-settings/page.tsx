@@ -1,4 +1,5 @@
 import { documentAction, heroAction, textsAction } from "@/lib/actions";
+import { AdminFileField } from "@/components/admin-file-field";
 import { Notice } from "@/components/notice";
 import { getDocuments, getSettings } from "@/lib/content";
 
@@ -25,10 +26,10 @@ export default async function SiteSettingsPage({ searchParams }: { searchParams:
       <form className="ttpa-card ttpa-form" action={heroAction}>
         <h3>Kapak görselleri</h3>
         <p>Masaüstü: {settings.hero_image_desktop || "varsayılan"}</p>
-        <label>Masaüstü<input name="hero_image_desktop" type="file" accept="image/*" /></label>
+        <AdminFileField name="hero_image_desktop" label="Masaüstü" />
         <label><input name="clear_hero_image_desktop" type="checkbox" value="1" /> Masaüstünü temizle</label>
         <p>Mobil: {settings.hero_image_mobile || "varsayılan"}</p>
-        <label>Mobil<input name="hero_image_mobile" type="file" accept="image/*" /></label>
+        <AdminFileField name="hero_image_mobile" label="Mobil" />
         <label><input name="clear_hero_image_mobile" type="checkbox" value="1" /> Mobil kapak görselini temizle</label>
         <div className="ttpa-actions"><button className="btn" type="submit">Kapakları kaydet</button></div>
       </form>
@@ -43,7 +44,7 @@ export default async function SiteSettingsPage({ searchParams }: { searchParams:
         ))}
         <form className="ttpa-form" action={documentAction}>
           <label>Başlık<input name="doc_title" required /></label>
-          <label>Dosya<input name="doc_file" type="file" accept="image/*,.pdf" required /></label>
+          <AdminFileField name="doc_file" label="Dosya" accept="image/*,.pdf" kind="document" required />
           <div className="ttpa-actions"><button className="btn" type="submit">Belge ekle</button></div>
         </form>
       </div>

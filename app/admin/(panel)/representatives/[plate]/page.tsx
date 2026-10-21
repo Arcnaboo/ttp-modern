@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { memberAction, representativeAction } from "@/lib/actions";
+import { AdminFileField } from "@/components/admin-file-field";
 import { Notice } from "@/components/notice";
 import { sql } from "@/lib/db";
 import { PROVINCES } from "@/lib/provinces";
@@ -36,9 +37,9 @@ export default async function ProvinceAdminPage({
         <label>Ad Soyad<input name="name" defaultValue={rep?.name ?? ""} required /></label>
         <label>Unvan<input name="title" defaultValue={rep?.title ?? "İl Başkanı"} /></label>
         <label>Sıra<input name="sort_order" type="number" defaultValue={rep?.sort_order ?? 0} /></label>
-        <label>Fotoğraf<input name="photo" type="file" accept="image/*" /></label>
+        <AdminFileField name="photo" label="Fotoğraf" />
         {rep?.photo ? <img src={assetUrl(rep.photo)} alt="" width={60} height={60} /> : null}
-        <label>Yetki belgesi<input name="certificate" type="file" accept="image/*" /></label>
+        <AdminFileField name="certificate" label="Yetki belgesi" />
         <div className="ttpa-actions">
           <button className="btn" type="submit">Kaydet</button>
           {rep ? <button className="btn danger" name="delete_rep" value="1" type="submit">Sil</button> : null}
@@ -80,8 +81,8 @@ export default async function ProvinceAdminPage({
           </select>
         </label>
         <label>Sıra<input name="sort_order" type="number" defaultValue={editing?.sort_order ?? 0} /></label>
-        <label>Fotoğraf<input name="photo" type="file" accept="image/*" /></label>
-        <label>Yetki belgesi<input name="certificate" type="file" accept="image/*" /></label>
+        <AdminFileField name="photo" label="Fotoğraf" />
+        <AdminFileField name="certificate" label="Yetki belgesi" />
         <div className="ttpa-actions"><button className="btn" type="submit">Kaydet</button></div>
       </form>
     </>

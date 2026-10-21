@@ -6,6 +6,23 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  experimental: {
+    serverActions: {
+      // Multipart uploads need headroom above the raw file size.
+      bodySizeLimit: "10mb",
+    },
+  },
+  async rewrites() {
+    return {
+      // beforeFiles: skip public/ lookup so runtime uploads in data/ are reachable.
+      beforeFiles: [
+        {
+          source: "/wp-content/uploads/admin/:file",
+          destination: "/api/media/admin/:file",
+        },
+      ],
+    };
+  },
   async redirects() {
     return [
       { source: "/index.php", destination: "/", permanent: true },

@@ -26,7 +26,7 @@ npm run db:import
 npm run dev
 ```
 
-`next.config.ts` içinde `turbopack.root` bu uygulama klasörüne sabitlenir; üst dizindeki başka `package-lock.json` dosyaları kökü kaydırmaz. Yönetim paneli yüklemeleri `public/wp-content/uploads/admin` altına yazılır.
+`next.config.ts` içinde `turbopack.root` bu uygulama klasörüne sabitlenir; üst dizindeki başka `package-lock.json` dosyaları kökü kaydırmaz. Yönetim paneli dosya yüklemeleri `POST /admin/upload` ile `data/uploads/admin` altına yazılır ve `/wp-content/uploads/admin/*` adresi `GET /api/media/admin/*` üzerinden sunulur (`public/` runtime yazımı için kullanılmaz).
 
 `db:import`, `Terorsuz_Turkiye_Platformu/veritabani.sql` dosyasını okur, bozuk Türkçe karakterleri onarır ve `db/schema.sql` tablolarına yazar. Aynı komut veriyi baştan yükler.
 
@@ -51,6 +51,6 @@ npm start
 
 Herkese açık sayfalar editorial bir tasarım sistemi kullanır: mürekkep lacivert (`#0B1120`), kâğıt (`#F7F4EF`), bayrak kırmızısı (`#E30A17`) ve aksiyon kırmızısı (`#9B1C24`). Tipografi `next/font` ile Newsreader (başlık) ve Source Sans 3 (gövde) olarak yüklenir. Ortak kabuk `app/(site)/layout.tsx` içindedir. Stiller `app/globals.css` ve `app/styles/site.css` dosyalarındadır; eski Elementor/WordPress stil dosyaları yüklenmez. Rotalar, CMS metinleri ve admin iş akışları aynıdır.
 
-Eski `.php` adresleri kalıcı olarak bu yollara yönlenir. Görseller `public/wp-content/uploads` ve `public/assets` altındadır; veritabanındaki yollar aynı kalır. Yeni yüklemeler `public/wp-content/uploads/admin` altına yazılır. Sekme ikonu `public/logo.png` dosyasıdır.
+Eski `.php` adresleri kalıcı olarak bu yollara yönlenir. Hazır görseller `public/wp-content/uploads` ve `public/assets` altındadır; veritabanındaki yollar aynı kalır. Panelden yüklenen dosyalar `data/uploads/admin` altındadır. Sekme ikonu `public/logo.png` dosyasıdır.
 
 Admin oturumu httpOnly çerezdir. Giriş `ADMIN_USERNAME` ve `ADMIN_PASSWORD` ile yapılır; başarılı girişte `admin_users` satırı ortam değerleriyle senkronize edilir. `db:import` aynı senkronu çalıştırır. Şifre panelden değil, `.env.local` üzerinden değiştirilir (sunucuyu yeniden başlatın). Beş hatalı giriş aynı IP’yi 15 dakika kilitler. Boşta 2 saat, en fazla 12 saat geçerlidir.

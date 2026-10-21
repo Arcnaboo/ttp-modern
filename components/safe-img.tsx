@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const PLACEHOLDER = "/assets/images/placeholder-avatar.svg";
 
@@ -21,10 +21,14 @@ export function SafeImg({
 }) {
   const [current, setCurrent] = useState(src || fallback);
 
+  useEffect(() => {
+    setCurrent(src || fallback);
+  }, [src, fallback]);
+
   return (
     <img
       className={className}
-      src={current}
+      src={current || fallback}
       alt={alt}
       width={width}
       height={height}
