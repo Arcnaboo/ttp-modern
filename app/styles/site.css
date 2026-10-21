@@ -1004,7 +1004,7 @@
 
 .team-photo {
   aspect-ratio: 3 / 4;
-  background: var(--color-ink);
+  background: var(--color-line);
 }
 
 .team-photo img {

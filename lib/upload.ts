@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { access, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 
@@ -15,15 +15,29 @@ function kindOf(buffer: Buffer) {
   return null;
 }
 
+function projectRoot() {
+  return process.cwd();
+}
+
 export async function saveUpload(file: FormDataEntryValue | null, allowed: string[]): Promise<{ path: string | null; error?: string }> {
   if (!(file instanceof File) || file.size === 0) return { path: null };
   if (file.size > MAX_BYTES) return { path: null, error: "Dosya 5MB'dan büyük olamaz." };
   const buffer = Buffer.from(await file.arrayBuffer());
+  if (buffer.length === 0) return { path: null, error: "Dosya boş." };
   const kind = kindOf(buffer);
-  if (!kind || !allowed.includes(kind)) return { path: null, error: "Desteklenmeyen dosya türü." };
+  if (!kind || !allowed.includes(kind)) {
+    return { path: null, error: "Desteklenmeyen dosya türü. JPG, PNG, WEBP veya GIF yükleyin." };
+  }
   const filename = `${randomBytes(8).toString("hex")}.${kind}`;
-  const directory = path.join(process.cwd(), "public", "wp-content", "uploads", "admin");
+  const relative = path.posix.join("wp-content/uploads/admin", filename);
+  const directory = path.resolve(projectRoot(), "public", "wp-content", "uploads", "admin");
+  const absolute = path.resolve(directory, filename);
   await mkdir(directory, { recursive: true });
-  await writeFile(path.join(directory, filename), buffer);
-  return { path: `wp-content/uploads/admin/${filename}` };
+  await writeFile(absolute, buffer);
+  try {
+    await access(absolute);
+  } catch {
+    return { path: null, error: "Dosya diske yazılamadı. Tekrar deneyin." };
+  }
+  return { path: relative };
 }

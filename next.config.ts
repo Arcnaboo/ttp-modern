@@ -1,6 +1,11 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Parent folder has another package-lock.json; pin Turbopack to this app.
+  turbopack: {
+    root: path.join(__dirname),
+  },
   async redirects() {
     return [
       { source: "/index.php", destination: "/", permanent: true },

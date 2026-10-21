@@ -1,5 +1,6 @@
 import { boardAction } from "@/lib/actions";
 import { Notice } from "@/components/notice";
+import { SafeImg } from "@/components/safe-img";
 import { getBoard } from "@/lib/content";
 import { assetUrl } from "@/lib/paths";
 
@@ -18,7 +19,7 @@ export default async function BoardAdminPage({ searchParams }: { searchParams: P
           <tbody>
             {members.map((member) => (
               <tr key={member.id}>
-                <td>{member.photo ? <img src={assetUrl(member.photo)} alt="" /> : null}</td>
+                <td>{member.photo ? <SafeImg src={assetUrl(member.photo)} alt="" width={40} height={40} /> : null}</td>
                 <td>{member.name}</td>
                 <td>{member.title}</td>
                 <td>{member.org}</td>

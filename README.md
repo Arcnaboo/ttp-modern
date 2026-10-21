@@ -26,6 +26,8 @@ npm run db:import
 npm run dev
 ```
 
+`next.config.ts` içinde `turbopack.root` bu uygulama klasörüne sabitlenir; üst dizindeki başka `package-lock.json` dosyaları kökü kaydırmaz. Yönetim paneli yüklemeleri `public/wp-content/uploads/admin` altına yazılır.
+
 `db:import`, `Terorsuz_Turkiye_Platformu/veritabani.sql` dosyasını okur, bozuk Türkçe karakterleri onarır ve `db/schema.sql` tablolarına yazar. Aynı komut veriyi baştan yükler.
 
 Üretim:

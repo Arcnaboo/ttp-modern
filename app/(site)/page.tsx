@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { IconArrowUpRight, IconGrid, IconPlay } from "@/components/icons";
 import { RichHtml } from "@/components/rich-html";
+import { SafeImg } from "@/components/safe-img";
 import { TeamScroller } from "@/components/team-scroller";
 import { TurkeyMap } from "@/components/turkey-map";
 import { getBoard, getCoordinators, getInstagramPosts, getNews, getProvinceMap, getSettings } from "@/lib/content";
@@ -173,7 +174,7 @@ export default async function HomePage() {
         {board.map((member) => (
           <article className="team-card" key={member.id}>
             <div className="team-photo">
-              <img src={assetUrl(member.photo) || "/assets/images/placeholder-avatar.svg"} alt={member.name} width={184} height={245} />
+              <SafeImg src={assetUrl(member.photo)} alt={member.name} width={184} height={245} />
             </div>
             <div className="team-info">
               <h4>{member.name}</h4>
