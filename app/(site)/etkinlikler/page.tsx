@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { EmptyState } from "@/components/empty-state";
+import { PageIntro } from "@/components/page-intro";
 
 export const metadata: Metadata = { title: "Etkinlikler" };
 
 export default function EventsPage() {
   return (
     <>
-      <SiteHeader pageTitle="Etkinlikler" />
-      <main><div className="haber-wrap"><p className="haber-empty">İçerik yakında eklenecektir.</p></div></main>
-      <SiteFooter />
+      <PageIntro title="Etkinlikler" lead="Milli birlik ve kardeşlik buluşmalarımız." />
+      <EmptyState title="Etkinlikler yakında" />
     </>
   );
 }

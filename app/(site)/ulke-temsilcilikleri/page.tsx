@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { EmptyState } from "@/components/empty-state";
+import { PageIntro } from "@/components/page-intro";
 
 export const metadata: Metadata = { title: "Ülke Temsilcilikleri" };
 
 export default function CountryOfficesPage() {
   return (
     <>
-      <SiteHeader pageTitle="Ülke Temsilcilikleri" />
-      <main><div className="haber-wrap"><p className="haber-empty">İçerik yakında eklenecektir.</p></div></main>
-      <SiteFooter />
+      <PageIntro title="Ülke Temsilcilikleri" lead="Yurt dışındaki temsilcilik ağımız." />
+      <EmptyState title="Ülke temsilcilikleri yakında" />
     </>
   );
 }

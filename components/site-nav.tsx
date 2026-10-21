@@ -1,101 +1,179 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-
-const links = [
-  { href: "/", label: "Anasayfa" },
-  {
-    label: "Kurumsal",
-    children: [
-      { href: "/kurumsal/hakkimizda", label: "Hakkımızda" },
-      { href: "/#misyon-vizyon-section", label: "Vizyonumuz" },
-      { href: "/#misyon-vizyon-section", label: "Misyonumuz" },
-      { href: "/kurumsal/tuzuk", label: "Tüzüğümüz" },
-      { href: "/kurumsal/belgeler", label: "Belgeler" },
-    ],
-  },
-  { href: "/#yonetim-kurulu-section", label: "Yönetim Kurulu" },
-  {
-    label: "Temsilcilikler",
-    children: [
-      { href: "/il-ve-ilce-baskanliklari", label: "İl ve İlçe Başkanlıkları" },
-      { href: "/ulke-temsilcilikleri", label: "Ülke Temsilcilikleri" },
-    ],
-  },
-  { href: "/projeler", label: "Projeler" },
-  { href: "/haberler", label: "Haberler" },
-  { href: "/iletisim", label: "İletişim" },
-];
+import { usePathname } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
+import { IconChevronDown, IconClose, IconMenu } from "@/components/icons";
+import { LOGO_SRC, NAV_LINKS } from "@/components/nav-links";
 
 export function SiteNav() {
-  const [open, setOpen] = useState(false);
-  const [section, setSection] = useState<string | null>(null);
+  const pathname = usePathname();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>(null);
+  const [desktopOpen, setDesktopOpen] = useState<string | null>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    setDrawerOpen(false);
+    setOpenSection(null);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const root = drawerRef.current;
+    const focusables = root?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+    );
+    focusables?.[0]?.focus();
+
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setDrawerOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !focusables?.length) return;
+      const list = Array.from(focusables);
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKey);
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = original;
+      previous?.focus?.();
+      toggleRef.current?.focus();
+    };
+  }, [drawerOpen]);
 
   return (
-    <div className="elementor-element-1d98a9af">
-      <button
-        className="elementskit-menu-hamburger elementskit-menu-toggler"
-        type="button"
-        aria-label="Menüyü aç"
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-      >
-        <span className="elementskit-menu-hamburger-icon" />
-        <span className="elementskit-menu-hamburger-icon" />
-        <span className="elementskit-menu-hamburger-icon" />
-      </button>
-      <button
-        className={`elementskit-menu-overlay${open ? " is-open" : ""}`}
-        type="button"
-        aria-label="Menüyü kapat"
-        onClick={() => setOpen(false)}
-      />
-      <div id="ekit-megamenu-ana" className={`elementskit-menu-container elementskit-menu-offcanvas-elements${open ? " is-open" : ""}`}>
-        <div className="elementskit-nav-identity-panel">
-          <Link href="/" onClick={() => setOpen(false)}>
-            <img src="/wp-content/uploads/2026/03/Terorsuz-Turkiye-2-copy.png" alt="Terörsüz Türkiye Platformu" width={46} height={46} />
-          </Link>
-          <button className="elementskit-menu-close" type="button" aria-label="Menüyü kapat" onClick={() => setOpen(false)}>
-            ×
-          </button>
-        </div>
-        <ul className="elementskit-navbar-nav">
-          {links.map((item) =>
+    <>
+      <nav className="site-nav-desktop" aria-label="Ana menü">
+        <ul className="site-nav-list">
+          {NAV_LINKS.map((item) =>
             item.children ? (
-              <li key={item.label} className={`ttp-nav-drop${section === item.label ? " is-open" : ""}`}>
-                <a
-                  className="ekit-menu-nav-link"
-                  role="button"
-                  href={`#${item.label}`}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setSection((current) => (current === item.label ? null : item.label));
-                  }}
+              <li
+                key={item.label}
+                className={`site-nav-item${desktopOpen === item.label ? " is-open" : ""}`}
+                onMouseEnter={() => setDesktopOpen(item.label)}
+                onMouseLeave={() => setDesktopOpen(null)}
+              >
+                <button
+                  type="button"
+                  className="site-nav-trigger"
+                  aria-expanded={desktopOpen === item.label}
+                  aria-haspopup="true"
+                  onClick={() => setDesktopOpen((current) => (current === item.label ? null : item.label))}
                 >
                   {item.label}
-                  <span className="elementskit-submenu-indicator">▾</span>
-                </a>
-                <ul className="elementskit-dropdown elementskit-submenu-panel">
+                  <IconChevronDown />
+                </button>
+                <ul className="site-nav-drop">
                   {item.children.map((child) => (
                     <li key={child.label}>
-                      <Link href={child.href} onClick={() => setOpen(false)}>
-                        {child.label}
-                      </Link>
+                      <Link href={child.href}>{child.label}</Link>
                     </li>
                   ))}
                 </ul>
               </li>
             ) : (
               <li key={item.href}>
-                <Link className="ekit-menu-nav-link" href={item.href} onClick={() => setOpen(false)}>
+                <Link
+                  href={item.href}
+                  className="site-nav-link"
+                  aria-current={pathname === item.href ? "page" : undefined}
+                >
                   {item.label}
                 </Link>
               </li>
             ),
           )}
         </ul>
-      </div>
-    </div>
+      </nav>
+
+      <button
+        ref={toggleRef}
+        type="button"
+        className="site-icon-btn site-menu-toggle"
+        aria-label="Menüyü aç"
+        aria-expanded={drawerOpen}
+        aria-controls="site-mobile-drawer"
+        onClick={() => setDrawerOpen(true)}
+      >
+        <IconMenu />
+      </button>
+
+      {drawerOpen ? (
+        <>
+          <button type="button" className="site-drawer-backdrop" aria-label="Menüyü kapat" onClick={() => setDrawerOpen(false)} />
+          <div
+            ref={drawerRef}
+            id="site-mobile-drawer"
+            className="site-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+          >
+            <div className="site-drawer-head">
+              <Link href="/" onClick={() => setDrawerOpen(false)} className="site-logo">
+                <img className="site-logo-mark" src={LOGO_SRC} alt="" width={44} height={44} />
+                <span id={titleId} className="site-logo-text">
+                  <span className="site-logo-title">Terörsüz Türkiye</span>
+                  <span className="site-logo-sub">Platformu</span>
+                </span>
+              </Link>
+              <button type="button" className="site-icon-btn" aria-label="Menüyü kapat" onClick={() => setDrawerOpen(false)}>
+                <IconClose />
+              </button>
+            </div>
+            <ul className="site-drawer-list">
+              {NAV_LINKS.map((item) =>
+                item.children ? (
+                  <li key={item.label}>
+                    <button
+                      type="button"
+                      aria-expanded={openSection === item.label}
+                      onClick={() => setOpenSection((current) => (current === item.label ? null : item.label))}
+                    >
+                      {item.label}
+                      <IconChevronDown />
+                    </button>
+                    {openSection === item.label ? (
+                      <ul className="site-drawer-sub">
+                        {item.children.map((child) => (
+                          <li key={child.label}>
+                            <Link href={child.href} onClick={() => setDrawerOpen(false)}>
+                              {child.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                ) : (
+                  <li key={item.href}>
+                    <Link href={item.href} onClick={() => setDrawerOpen(false)}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+        </>
+      ) : null}
+    </>
   );
 }

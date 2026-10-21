@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { EmptyState } from "@/components/empty-state";
+import { PageIntro } from "@/components/page-intro";
 import { getSettings } from "@/lib/content";
 import { digits } from "@/lib/paths";
 
@@ -17,21 +17,25 @@ export default async function ContactPage() {
 
   return (
     <>
-      <SiteHeader pageTitle="İletişim" />
-      <main>
-        <div className="haber-wrap">
-          {cards.length === 0 ? <p className="haber-empty">İletişim bilgileri yakında eklenecektir.</p> : null}
-          <div className="contact-info-grid">
-            {cards.map(([label, value, href]) => (
-              <article className="contact-info-card" key={label}>
-                <span className="ci-label">{label}</span>
-                {href ? <a className="ci-value" href={href}>{value}</a> : <span className="ci-value">{value}</span>}
-              </article>
-            ))}
-          </div>
+      <PageIntro title="İletişim" lead="Sorularınız, önerileriniz ve gönüllülük başvurularınız için bize ulaşın." />
+      {cards.length === 0 ? (
+        <EmptyState title="İletişim bilgileri yakında" body="İletişim bilgileri yakında eklenecektir." />
+      ) : (
+        <div className="contact-grid">
+          {cards.map(([label, value, href]) => (
+            <article className="contact-card" key={label}>
+              <span className="contact-label">{label}</span>
+              {href ? (
+                <a className="contact-value" href={href}>
+                  {value}
+                </a>
+              ) : (
+                <span className="contact-value">{value}</span>
+              )}
+            </article>
+          ))}
         </div>
-      </main>
-      <SiteFooter />
+      )}
     </>
   );
 }

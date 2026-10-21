@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { IconChevronLeft } from "@/components/icons";
 import { RichHtml } from "@/components/rich-html";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import { getNewsBySlug } from "@/lib/content";
 import { formatTrDate } from "@/lib/format";
+import { assetUrl } from "@/lib/paths";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -20,20 +20,30 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ sl
 
   return (
     <>
-      <SiteHeader />
-      <main>
-        <div className="ttp-article-band">
-          <div className="ttp-article-band-inner">
-            <Link className="ttp-article-back" href="/haberler">← Haberler</Link>
-            <h1 className="ttp-article-title">{item.title}</h1>
-            <span className="ttp-article-date">{formatTrDate(item.published_at)}</span>
-          </div>
+      <header className="article-band">
+        <div className="article-band-inner">
+          <Link className="article-back" href="/haberler">
+            <IconChevronLeft />
+            Haberler
+          </Link>
+          <h1 className="article-title">{item.title}</h1>
+          <span className="article-date">{formatTrDate(item.published_at)}</span>
         </div>
-        <div className="haber-wrap">
-          <RichHtml html={item.body_html} />
+      </header>
+      {item.cover_image ? (
+        <div className="site-container" style={{ marginTop: "2rem" }}>
+          <img
+            src={assetUrl(item.cover_image)}
+            alt=""
+            width={1200}
+            height={675}
+            style={{ width: "100%", height: "auto", display: "block", borderRadius: "2px" }}
+          />
         </div>
-      </main>
-      <SiteFooter />
+      ) : null}
+      <div className="article-body">
+        <RichHtml className="haber-article-body" html={item.body_html} />
+      </div>
     </>
   );
 }

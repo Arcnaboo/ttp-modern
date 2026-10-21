@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IconClose } from "@/components/icons";
 import type { Coordinator, MemberNode, ProvinceData } from "@/lib/content";
 
 const PLACEHOLDER = "/assets/images/placeholder-avatar.svg";
@@ -66,13 +67,16 @@ export function TurkeyMap({
         }}
         onMouseMove={(event) => {
           const plate = plateFrom(event.target);
-          if (!plate) return;
-          setTooltip({ name: provinces[plate]?.name ?? plate, x: event.pageX, y: event.pageY + 25 });
+          if (!plate) {
+            setTooltip(null);
+            return;
+          }
+          setTooltip({ name: provinces[plate]?.name ?? plate, x: event.clientX + 12, y: event.clientY + 16 });
         }}
         onMouseLeave={() => setTooltip(null)}
       />
       {tooltip ? (
-        <div className="turkey-map-name" style={{ position: "absolute", left: tooltip.x, top: tooltip.y, zIndex: 999999 }}>
+        <div className="turkey-map-name" style={{ left: tooltip.x, top: tooltip.y }}>
           <div>{tooltip.name}</div>
         </div>
       ) : null}
@@ -165,11 +169,19 @@ export function TurkeyMap({
         </div>
       ) : null}
       {certificate ? (
-        <div className="ttp-lightbox is-open" onClick={() => setCertificate(null)}>
-          <button type="button" className="ttp-lightbox-close" aria-label="Kapat">
-            ×
+        <div className="ttp-lightbox is-open" onClick={() => setCertificate(null)} role="dialog" aria-modal="true" aria-label={certificate.title}>
+          <button
+            type="button"
+            className="ttp-lightbox-close"
+            aria-label="Kapat"
+            onClick={(event) => {
+              event.stopPropagation();
+              setCertificate(null);
+            }}
+          >
+            <IconClose />
           </button>
-          <img className="ttp-lightbox-img" src={certificate.src} alt={certificate.title} />
+          <img className="ttp-lightbox-img" src={certificate.src} alt={certificate.title} onClick={(event) => event.stopPropagation()} />
         </div>
       ) : null}
     </section>

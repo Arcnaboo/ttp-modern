@@ -1,6 +1,6 @@
-import { compare, hash } from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { adminCredentials, credentialsMatch, ensureEnvAdminUser } from "@/lib/admin-credentials";
 import { sql } from "@/lib/db";
 import {
   fingerprint,
@@ -14,7 +14,6 @@ import {
 
 const LOCK_SECONDS = 900;
 const MAX_ATTEMPTS = 5;
-const DUMMY_HASH = "$2a$10$usesomesillystringforsalt0000000000000000000000000000000000";
 
 export async function clientIp() {
   const headerStore = await headers();
@@ -85,27 +84,17 @@ export async function attemptLogin(username: string, password: string) {
   const locked = await lockSecondsLeft(ip);
   if (locked > 0) return { ok: false as const, locked };
 
-  const users = await sql<{ id: number; password_hash: string }[]>`
-    SELECT id, password_hash FROM admin_users WHERE username = ${username} LIMIT 1
-  `;
-  const user = users[0];
-  const stored = (user?.password_hash ?? DUMMY_HASH).replace(/^\$2y\$/, "$2a$");
-  let matches = false;
-  try {
-    matches = await compare(password, stored);
-  } catch {
-    matches = false;
-  }
-  if (!user || !matches) {
+  if (!adminCredentials().configured || !credentialsMatch(username, password)) {
     await recordFailure(ip, username);
     return { ok: false as const, locked: 0 };
   }
 
+  const user = await ensureEnvAdminUser();
   await sql`DELETE FROM login_attempts WHERE ip = ${ip}`;
   const now = Math.floor(Date.now() / 1000);
   await writeSession({
     id: user.id,
-    username,
+    username: user.username,
     loginTime: now,
     lastActivity: now,
     fingerprint: await fingerprint(await userAgent()),
@@ -117,15 +106,4 @@ export async function refreshSession(session: AdminSession) {
   const now = Math.floor(Date.now() / 1000);
   if (now - session.lastActivity < 60) return;
   await writeSession(touchSession(session));
-}
-
-export async function changePassword(userId: number, current: string, next: string) {
-  const users = await sql<{ password_hash: string }[]>`
-    SELECT password_hash FROM admin_users WHERE id = ${userId} LIMIT 1
-  `;
-  const stored = (users[0]?.password_hash ?? "").replace(/^\$2y\$/, "$2a$");
-  if (!stored || !(await compare(current, stored))) return false;
-  const nextHash = await hash(next, 10);
-  await sql`UPDATE admin_users SET password_hash = ${nextHash} WHERE id = ${userId}`;
-  return true;
 }

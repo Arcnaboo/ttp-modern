@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { adminCredentials, ensureEnvAdminUser } from "../lib/admin-credentials";
 import { sql } from "../lib/db";
 import { repairMojibake } from "../lib/repair";
 
@@ -314,6 +315,13 @@ async function main() {
     ["representative_members", "representative_members_id_seq"],
   ] as const) {
     await resetSequence(table, sequence);
+  }
+
+  if (adminCredentials().configured) {
+    const admin = await ensureEnvAdminUser();
+    console.log(`Admin synced from env: ${admin.username} (id ${admin.id})`);
+  } else {
+    console.warn("ADMIN_USERNAME / ADMIN_PASSWORD tanımlı değil; giriş için .env.local’e ekleyin.");
   }
 
   const counts = await sql<{ table_name: string; n: number }[]>`

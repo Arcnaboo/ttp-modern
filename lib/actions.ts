@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { attemptLogin, changePassword, clearSession, lockSecondsLeft, requireAdmin, clientIp } from "@/lib/auth";
+import { attemptLogin, clearSession, lockSecondsLeft, requireAdmin, clientIp } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { sanitizeRichText } from "@/lib/html";
 import { syncInstagram } from "@/lib/instagram";
@@ -43,16 +43,13 @@ export async function logoutAction() {
   redirect("/admin/login");
 }
 
-export async function passwordAction(formData: FormData) {
-  const session = await requireAdmin();
-  const current = String(formData.get("current") ?? "");
-  const next = String(formData.get("next") ?? "");
-  const again = String(formData.get("again") ?? "");
-  if (next.length < 8) redirectWithNotice("/admin/password", "err", "Yeni şifre en az 8 karakter olmalı.");
-  if (next !== again) redirectWithNotice("/admin/password", "err", "Yeni şifreler eşleşmiyor.");
-  const changed = await changePassword(session.id, current, next);
-  if (!changed) redirectWithNotice("/admin/password", "err", "Mevcut şifre hatalı.");
-  redirectWithNotice("/admin/password", "ok", "Şifre güncellendi.");
+export async function passwordAction(_formData: FormData) {
+  await requireAdmin();
+  redirectWithNotice(
+    "/admin/password",
+    "err",
+    "Şifre .env.local içindeki ADMIN_PASSWORD ile yönetilir. Değiştirip sunucuyu yeniden başlatın.",
+  );
 }
 
 export async function boardAction(formData: FormData) {
